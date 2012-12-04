@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            description="Diagram Type for Feature Diagram Editor"
+            id="org.eclipse.featuremodel.diagrameditor.diagramtype"
+            name="Feature Diagram"
+            type="Feature Diagram">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            class="org.eclipse.featuremodel.diagrameditor.diagram.FMEDiagramTypeProvider"
+            description="Diagram Type Provider for Feature Diagram Editor"
+            id="org.eclipse.featuremodel.diagrameditor.diagramtypeprovider"
+            name="Feature Diagram Type Provider">
+         <diagramType
+               id="org.eclipse.featuremodel.diagrameditor.diagramtype">
+         </diagramType>
+      </diagramTypeProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+         name="Feature Model Editor"
+         id="org.eclipse.featuremodel.diagrameditor.wizard.category">
+      </category>
+      <wizard
+            class="org.eclipse.featuremodel.diagrameditor.FMENewWizard"
+            icon="icons/featuremodel.png"
+            id="org.eclipse.featuremodel.diagrameditor.wizard"
+            name="Feature Diagram">
+         <description>
+            Creates a new Feature Diagram.
+         </description>
+      </wizard>
+   </extension>	    
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.featuremodel.diagrameditor.FMEDiagramEditor"
+            contributorClass="org.eclipse.featuremodel.diagrameditor.FMEEditorActionBarContributor"
+            default="true"
+            extensions="featurediagram"
+            icon="icons/featuremodel.png"
+            id="org.eclipse.featuremodel.diagrameditor.diagrameditor"
+            matchingStrategy="org.eclipse.graphiti.ui.editor.DiagramEditorMatchingStrategy"
+            name="Feature Diagram Editor">
+      </editor>
+   </extension>
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="org.eclipse.featuremodel.diagrameditor.popup.createwizardaction"
+            nameFilter="*.featuremodel"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="org.eclipse.featuremodel.diagrameditor.FMECreateWizardAction"
+               enablesFor="1"
+               icon="icons/featuremodel.png"
+               id="org.eclipse.featuremodel.diagrameditor.createwizardaction"
+               label="Create Feature Diagram"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+   
+</plugin>
