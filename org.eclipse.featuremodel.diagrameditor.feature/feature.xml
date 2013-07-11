@@ -214,7 +214,7 @@ litigation.
 
    <url>
       <discovery label="EMF Feature Model" url="http://download.eclipse.org/modeling/emft/featuremodel/update-site/"/>
-      <discovery label="Eclipse Graphiti" url="http://download.eclipse.org/graphiti/updates/0.9.1"/>
+      <discovery label="Eclipse Graphiti" url="http://download.eclipse.org/graphiti/updates/0.10.0"/>
    </url>
 
    <requires>
