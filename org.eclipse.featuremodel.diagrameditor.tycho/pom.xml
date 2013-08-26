@@ -1,0 +1,173 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	     <!-- Tycho requires Maven 3 -->
+        <prerequisites>
+                <maven>3.0</maven>
+        </prerequisites>
+
+	
+	<groupId>org.eclipse.featuremodel.diagrameditor.tycho</groupId>
+	<artifactId> org.eclipse.featuremodel.diagrameditor.tycho</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<properties>
+		<tycho-version>0.18.0</tycho-version>
+		<fornax-oaw-m2-plugin.version>3.4.0</fornax-oaw-m2-plugin.version>
+		<xtend-maven-plugin.version>2.3.1</xtend-maven-plugin.version>
+		 <platform-version-name>juno</platform-version-name>
+		
+	</properties>
+	<repositories>
+	
+		<repository>
+			<id>eclipse-juno</id>
+			<url>http://download.eclipse.org/releases/juno</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>xtend</id>
+			<url>http://build.eclipse.org/common/xtend/maven/</url>
+		</repository>
+		<repository>
+			<id>emft-featuremodel</id>
+			<url>https://hudson.eclipse.org/hudson/job/emf-featuremodel/lastSuccessfulBuild/artifact/update-site/</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+	
+	
+   
+   
+	<pluginRepositories>
+		<pluginRepository>
+			<id>fornax-snapshots</id>
+			<url>http://www.fornax-platform.org/nexus/content/repositories/releases/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>xtend</id>
+			<url>http://build.eclipse.org/common/xtend/maven/</url>
+		</pluginRepository>
+		
+	</pluginRepositories>
+	<build>
+		<plugins>
+			<!--   <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-versions-plugin</artifactId>
+        <version>${tycho-version}</version>
+      </plugin> -->
+			<plugin>
+				<!-- enable tycho build extension -->
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src-gen</source>
+							</sources>
+							<sources>
+								<source>${project.build.directory}/xtend-gen</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.xtend</groupId>
+				<artifactId>xtend-maven-plugin</artifactId>
+				<version>2.3.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<!-- need to prefix by basedir to generate to currently built module -->
+							<outputDirectory>${basedir}/xtend-gen</outputDirectory>
+							<encoding>UTF-8</encoding>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+            <plugin>
+		      <groupId>com.github.jeluard</groupId>
+		      <artifactId>plantuml-maven-plugin</artifactId>
+		      <version>7941</version>
+		      <configuration>
+		        <sourceFiles>
+		          <directory>${basedir}</directory>
+		          <includes>
+		            <include>src/**/*.java</include>
+		          </includes>
+		        </sourceFiles>
+		      </configuration>
+		    </plugin>
+		    
+		    <!--  
+		     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>purge-local-dependencies</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>purge-local-repository</goal>
+            </goals>
+            <configuration>
+              <includes>
+              	<include>de.imes.variants.presencecondition</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>-->
+		</plugins>
+		
+		 
+     
+  
+    
+	</build>
+	<!--  
+	<reporting>
+		<plugins>
+			<plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-javadoc-plugin</artifactId>
+	            <version>2.9</version>
+	            <configuration>
+	    			 <excludePackageNames>org.eclipse.*:*.parser.*</excludePackageNames>
+	            </configuration>
+            </plugin>
+         </plugins>
+	</reporting>
+	-->
+	<modules>
+					
+					<module>../org.eclipse.featuremodel.diagrameditor</module>
+					<module>../org.eclipse.featuremodel.diagrameditor.feature</module>
+						<module>../org.eclipse.featuremodel.diagrameditor.updatesite</module>
+   		 </modules>
+</project>

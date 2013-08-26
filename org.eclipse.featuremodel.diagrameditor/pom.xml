@@ -2,15 +2,15 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-  	<groupId>org.eclipse.featuremodel.metamodel.tycho</groupId>
-  	<artifactId>org.eclipse.featuremodel.metamodel.tycho</artifactId>
+  	<groupId>org.eclipse.featuremodel.diagrameditor.tycho</groupId>
+  	<artifactId>org.eclipse.featuremodel.diagrameditor.tycho</artifactId>
   	<version>1.0.1-SNAPSHOT</version>
-  	<relativePath>../org.eclipse.featuremodel.metamodel.tycho/pom.xml</relativePath>
+  	<relativePath>../org.eclipse.featuremodel.diagrameditor.tycho/pom.xml</relativePath>
   </parent>
   
   <groupId>org.eclipse.featuremodel.diagrameditor</groupId>
   <artifactId>org.eclipse.featuremodel.diagrameditor</artifactId>
-  <version>0.8.0</version>
+  <version>0.8.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
  	
   <properties>

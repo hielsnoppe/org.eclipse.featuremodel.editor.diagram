@@ -6,8 +6,10 @@
   	<version>1.0.1-SNAPSHOT</version>
   	<relativePath>../org.eclipse.featuremodel.diagrameditor.tycho/pom.xml</relativePath>
   </parent>
-  <groupId>org.eclipse.featuremodel.diagrameditor.feature</groupId>
-  <artifactId>org.eclipse.featuremodel.diagrameditor.feature</artifactId>
+  
+ <groupId>org.eclipse.featuremodel.updatesite</groupId>
+  <artifactId>org.eclipse.featuremodel.updatesite</artifactId>
   <version>0.8.0-SNAPSHOT</version>
-  <packaging>eclipse-feature</packaging>
+  <packaging>eclipse-repository</packaging>
+  
 </project>
