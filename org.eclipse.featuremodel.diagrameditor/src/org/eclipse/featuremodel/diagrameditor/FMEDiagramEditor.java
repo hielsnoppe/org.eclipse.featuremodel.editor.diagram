@@ -5,12 +5,23 @@ import org.eclipse.gef.MouseWheelHandler;
 import org.eclipse.gef.MouseWheelZoomHandler;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * A diagram editor for Feature Diagrams.
  * 
  */
-public class FMEDiagramEditor extends DiagramEditor {
+public class FMEDiagramEditor extends DiagramEditor implements ITabbedPropertySheetPageContributor {
+
+  /**
+   * Returns the contributor identifier for your configuration.
+   */
+  @Override
+  public String getContributorId() {
+    return getSite().getId();
+  }
 
   /** the editor identifier. */
   public static final String DIAGRAM_EDITOR_ID        = "org.eclipse.featuremodel.diagrameditor.diagrameditor";
@@ -38,4 +49,14 @@ public class FMEDiagramEditor extends DiagramEditor {
     GraphicalViewer viewer = getGraphicalViewer();
     viewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.MOD1), MouseWheelZoomHandler.SINGLETON);
   }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public Object getAdapter(Class adapter) {
+    if (adapter == IPropertySheetPage.class) {
+      return new TabbedPropertySheetPage(this);
+    }
+    return super.getAdapter(adapter);
+  }
+
 }

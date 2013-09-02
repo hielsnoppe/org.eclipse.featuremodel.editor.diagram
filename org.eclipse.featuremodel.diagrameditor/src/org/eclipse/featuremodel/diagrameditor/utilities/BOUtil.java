@@ -90,6 +90,7 @@ public class BOUtil {
         break;
       case OR:
         group.setLower(0);
+        group.setUpper(1);
         break;
       default:
         break;

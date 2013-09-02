@@ -64,7 +64,7 @@ public class MoveFeatureFeature extends DefaultMoveShapeFeature {
       // allow if the target is not the parent Group and not a child of the
       // Feature to move
       if (target instanceof Group //
-          && !featureToMove.getParentGroup().equals(target) //
+          && featureToMove.getParentGroup() != null && !featureToMove.getParentGroup().equals(target) //
           && !isTargetGroupChild(featureToMove, (Group) target)) {
         return true;
       }
@@ -79,7 +79,6 @@ public class MoveFeatureFeature extends DefaultMoveShapeFeature {
       }
 
     }
-
     return false;
   }
 
@@ -199,17 +198,33 @@ public class MoveFeatureFeature extends DefaultMoveShapeFeature {
    */
   @Override
   protected void postMoveShape(IMoveShapeContext context) {
-    Feature movedFeature = (Feature) this.getFeatureProvider().getBusinessObjectForPictogramElement(context.getShape());
+    Object pe = this.getFeatureProvider().getBusinessObjectForPictogramElement(context.getShape());
+    Feature movedFeature = null;
+    Group movedGroup = null;
 
-    // update the parent Group if exists
-    if (movedFeature.getParentGroup() != null) {
-      Connection c = BOUtil.getPictogramElementForBusinessObject(movedFeature.getParentGroup(), Connection.class, getFeatureProvider());
-      this.updatePictogramElement(c);
+    if (pe instanceof Feature) {
+      movedFeature = (Feature) pe;
+    }
+    else if (pe instanceof Group) {
+      movedGroup = (Group) pe;
     }
 
-    // update all child Groups if exist
-    for (Group gr : movedFeature.getChildren()) {
-      Connection c = BOUtil.getPictogramElementForBusinessObject(gr, Connection.class, getFeatureProvider());
+    if (movedFeature != null) {
+      // update the parent Group if exists
+      if (movedFeature.getParentGroup() != null) {
+        Connection c = BOUtil.getPictogramElementForBusinessObject(movedFeature.getParentGroup(), Connection.class, getFeatureProvider());
+        this.updatePictogramElement(c);
+      }
+
+      // update all child Groups if exist
+      for (Group gr : movedFeature.getChildren()) {
+        Connection c = BOUtil.getPictogramElementForBusinessObject(gr, Connection.class, getFeatureProvider());
+        this.updatePictogramElement(c);
+      }
+    }
+    // update the text which represents the cardinality if exists
+    else if (movedGroup != null) {
+      Connection c = BOUtil.getPictogramElementForBusinessObject(movedGroup, Connection.class, getFeatureProvider());
       this.updatePictogramElement(c);
     }
   }
@@ -274,8 +289,7 @@ public class MoveFeatureFeature extends DefaultMoveShapeFeature {
       Connection c = BOUtil.getPictogramElementForBusinessObject(oldParentGroup, Connection.class, getFeatureProvider());
       updatePictogramElement(c);
     }
-
-    getDiagramEditor().refresh();
+    getDiagramBehavior().refresh();
   }
 
   /**

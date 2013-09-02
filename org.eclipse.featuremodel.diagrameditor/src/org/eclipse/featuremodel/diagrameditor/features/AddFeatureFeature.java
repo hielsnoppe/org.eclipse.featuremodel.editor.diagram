@@ -3,12 +3,13 @@ package org.eclipse.featuremodel.diagrameditor.features;
 import org.eclipse.featuremodel.Feature;
 import org.eclipse.featuremodel.Group;
 import org.eclipse.featuremodel.diagrameditor.utilities.Properties;
+import org.eclipse.featuremodel.diagrameditor.utilities.StyleUtil;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
-import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
@@ -107,15 +108,14 @@ public class AddFeatureFeature extends AbstractAddFeature {
     peService.setPropertyValue(featureContainerShape, Properties.PROP_KEY_CONTAINER_TYPE, Properties.PROP_VAL_CONTAINER_TYPE_EXPANDED);
 
     Rectangle featureRectangle = gaService.createRectangle(featureContainerShape);
-    featureRectangle.setBackground(manageColor(ColorConstant.WHITE));
-    featureRectangle.setFilled(true);
+    featureRectangle.setStyle(StyleUtil.getStyleForFeature(getDiagram()));
     gaService.setLocationAndSize(featureRectangle, context.getX(), context.getY(), FEATURE_FIGURE_WIDTH, FEATURE_FIGURE_HIGH);
     // Link the visualization with the Feature model
     link(featureContainerShape, feature);
 
     // Create the Feature name field
     Shape featureNameShape = peService.createShape(featureContainerShape, false);
-    Text text = gaService.createText(featureNameShape);
+    MultiText text = gaService.createMultiText(featureNameShape);
     text.setForeground(manageColor(ColorConstant.BLACK));
     text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
     text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

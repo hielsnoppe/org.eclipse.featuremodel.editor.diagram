@@ -5,13 +5,13 @@ Bundle-SymbolicName: org.eclipse.featuremodel.diagrameditor;singleton:=true
 Bundle-Version: 0.8.0.qualifier
 Bundle-Activator: org.eclipse.featuremodel.diagrameditor.FMEPlugin
 Require-Bundle: org.eclipse.ui.ide;bundle-version="3.7.0",
- org.eclipse.graphiti;bundle-version="0.9",
- org.eclipse.graphiti.ui;bundle-version="0.9",
+ org.eclipse.graphiti;bundle-version="0.10.0",
+ org.eclipse.graphiti.ui;bundle-version="0.10.0",
  org.eclipse.featuremodel.metamodel;bundle-version="0.7.1",
  org.eclipse.emf.transaction;bundle-version="1.4.0",
  org.eclipse.emf.ecoretools.diagram;bundle-version="1.0.0",
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",
- org.eclipse.graphiti.export.batik;bundle-version="0.9.0"
+ org.eclipse.graphiti.export.batik;bundle-version="0.10.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: EMF Feature Model Project

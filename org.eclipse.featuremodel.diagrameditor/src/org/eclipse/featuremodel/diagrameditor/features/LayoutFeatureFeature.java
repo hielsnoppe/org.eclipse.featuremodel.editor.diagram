@@ -79,7 +79,7 @@ public class LayoutFeatureFeature extends AbstractLayoutFeature {
       GraphicsAlgorithm gaParent = peParent.getGraphicsAlgorithm();
 
       // determine X
-      // If parent Feature has more then one child Feature determine the x
+      // If parent Feature has more than one child Feature determine the x
       // coordinate of the
       // rightmost child Feature pictogram element.
       x = determineRightmostChildFeature(parent, featureToLayout);

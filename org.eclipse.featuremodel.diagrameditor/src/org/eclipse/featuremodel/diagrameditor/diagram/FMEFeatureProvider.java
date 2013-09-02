@@ -9,21 +9,29 @@ import org.eclipse.featuremodel.Group;
 import org.eclipse.featuremodel.diagrameditor.features.AddFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.AddFeatureModelFeature;
 import org.eclipse.featuremodel.diagrameditor.features.AddGroupFeature;
+import org.eclipse.featuremodel.diagrameditor.features.ChangeCardinalityTextColorFeature;
+import org.eclipse.featuremodel.diagrameditor.features.ChangeFeatureColorFeature;
+import org.eclipse.featuremodel.diagrameditor.features.ChangeFeatureTextColorFeature;
 import org.eclipse.featuremodel.diagrameditor.features.CollapseFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.CreateFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.DeleteFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.DirectEditFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.ExpandFeatureFeature;
+import org.eclipse.featuremodel.diagrameditor.features.HideLegendBoxFeature;
 import org.eclipse.featuremodel.diagrameditor.features.LayoutDiagramActionFeature;
 import org.eclipse.featuremodel.diagrameditor.features.LayoutDiagramFeature;
 import org.eclipse.featuremodel.diagrameditor.features.LayoutFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.MoveFeatureFeature;
+import org.eclipse.featuremodel.diagrameditor.features.PresentCardinalityFeature;
+import org.eclipse.featuremodel.diagrameditor.features.RemoveCardinalityFeature;
 import org.eclipse.featuremodel.diagrameditor.features.RemoveFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.ResizeFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.SetMandatoryRelationTypeFeature;
 import org.eclipse.featuremodel.diagrameditor.features.SetORRelationTypeFeature;
 import org.eclipse.featuremodel.diagrameditor.features.SetOptionalRelationTypeFeature;
 import org.eclipse.featuremodel.diagrameditor.features.SetXORRelationTypeFeature;
+import org.eclipse.featuremodel.diagrameditor.features.ShowAdaptedLegendBoxFeature;
+import org.eclipse.featuremodel.diagrameditor.features.ShowCompleteLegendBoxFeature;
 import org.eclipse.featuremodel.diagrameditor.features.UpdateFeatureFeature;
 import org.eclipse.featuremodel.diagrameditor.features.UpdateRelationshipFeature;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -48,6 +56,9 @@ import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Image;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
@@ -195,17 +206,27 @@ public class FMEFeatureProvider extends DefaultFeatureProvider {
     List<ICustomFeature> result = new ArrayList<ICustomFeature>();
     // context menu to layout the diagram
     result.add(new LayoutDiagramActionFeature(this));
-
+    // context menu to present and hide the cardinality relations for Group
+    result.add(new PresentCardinalityFeature(this));
+    result.add(new RemoveCardinalityFeature(this));
+    // context menu to show or hide legend box in the diagram
+    result.add(new ShowCompleteLegendBoxFeature(this));
+    result.add(new ShowAdaptedLegendBoxFeature(this));
+    result.add(new HideLegendBoxFeature(this));
     // context menus to set/change Group relation
     result.add(new SetOptionalRelationTypeFeature(this));
     result.add(new SetMandatoryRelationTypeFeature(this));
     result.add(new SetORRelationTypeFeature(this));
     result.add(new SetXORRelationTypeFeature(this));
-
     // context menu to collapse/expand Feature children
     result.add(new CollapseFeatureFeature(this));
     result.add(new ExpandFeatureFeature(this));
-
+    // context menu to change the color of cardinality text
+    result.add(new ChangeCardinalityTextColorFeature(this));
+    // context menu to change the color of feature text
+    result.add(new ChangeFeatureTextColorFeature(this));
+    // context menu to change the color of feature
+    result.add(new ChangeFeatureColorFeature(this));
     return result.toArray(new ICustomFeature[result.size()]);
   }
 
@@ -222,8 +243,13 @@ public class FMEFeatureProvider extends DefaultFeatureProvider {
   public IMoveShapeFeature getMoveShapeFeature(IMoveShapeContext context) {
     // Retrieve the domain object for the moved pictogram element
     Object obj = getBusinessObjectForPictogramElement(context.getShape());
+    GraphicsAlgorithm ga = context.getShape().getGraphicsAlgorithm();
 
     if (obj instanceof Feature) {
+      return new MoveFeatureFeature(this);
+    }
+    // If the shape represents an image
+    else if (ga instanceof Image || ga instanceof Text) { 
       return new MoveFeatureFeature(this);
     }
 

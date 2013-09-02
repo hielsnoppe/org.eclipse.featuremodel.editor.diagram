@@ -1,6 +1,8 @@
 package org.eclipse.featuremodel.diagrameditor.features;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.draw2d.geometry.Insets;
@@ -11,7 +13,9 @@ import org.eclipse.draw2d.graph.EdgeList;
 import org.eclipse.draw2d.graph.Node;
 import org.eclipse.draw2d.graph.NodeList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.featuremodel.Feature;
 import org.eclipse.featuremodel.FeatureModel;
+import org.eclipse.featuremodel.Group;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractLayoutFeature;
@@ -45,7 +49,7 @@ public class LayoutDiagramFeature extends AbstractLayoutFeature {
 
   /**
    * Checks whether the current pictogram element of the given context can be
-   * layouted.
+   * layout.
    * 
    * @param context
    *          The context.
@@ -73,10 +77,10 @@ public class LayoutDiagramFeature extends AbstractLayoutFeature {
    */
   @Override
   public boolean layout(ILayoutContext context) {
-    final CompoundDirectedGraph graph = mapDiagramToGraph();
-    graph.setDefaultPadding(new Insets(PADDING));
-    new CompoundDirectedGraphLayout().visit(graph);
-    mapGraphCoordinatesToDiagram(graph);
+    final CompoundDirectedGraph cdg = mapDiagramToGraph();
+    cdg.setDefaultPadding(new Insets(PADDING));
+    new CompoundDirectedGraphLayout().visit(cdg);
+    mapGraphCoordinatesToDiagram(cdg);
 
     // update all Group relations to given connections
     for (Connection c : getDiagram().getConnections()) {
@@ -84,6 +88,142 @@ public class LayoutDiagramFeature extends AbstractLayoutFeature {
     }
 
     return true;
+  }
+
+  /**
+   * Help method to map diagram objects to a graph nodes.
+   * 
+   * @return The graph.
+   */
+  @SuppressWarnings("unchecked")
+  private CompoundDirectedGraph mapDiagramToGraph() {
+    Map<AnchorContainer, Node> shapeToNode = new HashMap<AnchorContainer, Node>();
+    Map<String, EList<Feature>> groupIDToMembers = new HashMap<String, EList<Feature>>();
+    List<Shape> shapesAfterReorder = new ArrayList<Shape>();
+
+    Diagram diagram = getDiagram();
+    CompoundDirectedGraph cdg = new CompoundDirectedGraph();
+    EdgeList edgeList = new EdgeList();
+    NodeList nodeList = new NodeList();
+    EList<Shape> children = diagram.getChildren();
+
+    groupIDToMembers = getGroupInfos(children);
+
+    shapesAfterReorder = reorderShapes(groupIDToMembers, children);
+
+    nodeList = transferShapeToNode(shapesAfterReorder, shapeToNode);
+
+    EList<Connection> connections = diagram.getConnections();
+
+    for (Connection connection : connections) {
+      AnchorContainer source = connection.getStart().getParent();
+      AnchorContainer target = connection.getEnd().getParent();
+      Edge edge = new Edge(shapeToNode.get(source), shapeToNode.get(target));
+      edge.data = connection;
+      edgeList.add(edge);
+    }
+
+    cdg.nodes = nodeList;
+    cdg.edges = edgeList;
+    return cdg;
+  }
+
+  /**
+   * Help method to create a hash map, which uses group id as key and group
+   * members as value.
+   * 
+   * @param children
+   * @return all group informations in the diagram, include the group id and
+   *         group members
+   */
+  private Map<String, EList<Feature>> getGroupInfos(EList<Shape> children) {
+    Map<String, EList<Feature>> groupIDToMembers = new HashMap<String, EList<Feature>>();
+    for (Shape shape : children) {
+      PictogramElement localPE = shape.getGraphicsAlgorithm().getPictogramElement();
+      Object object = getBusinessObjectForPictogramElement(localPE);
+
+      if (object instanceof Feature) {
+        Feature feature = (Feature) object;
+        Group parentGroup = feature.getParentGroup();
+        if (null != parentGroup && !groupIDToMembers.keySet().contains(parentGroup.getId())) {
+          groupIDToMembers.put(parentGroup.getId(), parentGroup.getFeatures());
+        }
+      }
+    }
+    return groupIDToMembers;
+  }
+
+  /**
+   * Help method to use group informations to reorder all shapes in the diagram.
+   * 
+   * @param groupIDToMembers
+   * @param shapesBefore
+   * @return the shapes after reordered
+   */
+  private List<Shape> reorderShapes(Map<String, EList<Feature>> groupIDToMembers, EList<Shape> shapesBefore) {
+    List<Shape> shapesAfter = new ArrayList<Shape>();
+
+    for (Shape shape : shapesBefore) {
+      PictogramElement localPE = shape.getGraphicsAlgorithm().getPictogramElement();
+      Object object = getBusinessObjectForPictogramElement(localPE);
+
+      if (object instanceof Feature) {
+        Feature feature = (Feature) object;
+
+        if (feature.getParentGroup() != null) { // feature belongs to a group
+          String groupID = feature.getParentGroup().getId();
+
+          if (groupIDToMembers.keySet().contains(groupID)) {
+            EList<Feature> groupMembers = groupIDToMembers.get(groupID);
+
+            for (Feature member : groupMembers) {
+              PictogramElement pElement = getFeatureProvider().getPictogramElementForBusinessObject(member);
+
+              if (!shapesAfter.contains((Shape) pElement)) {
+                shapesAfter.add((Shape) pElement);
+              }
+            }
+          }
+        }
+        else { // the root feature which has no parent
+          if (!shapesAfter.contains(shape)) {
+            shapesAfter.add(shape);
+          }
+        }
+      }
+      else if (object instanceof Group) { // the polygon or polyline
+        if (!shapesAfter.contains(shape)) {
+          shapesAfter.add(shape);
+        }
+      }
+    }
+
+    return shapesAfter;
+  }
+
+  /**
+   * Iterate all shapes in the diagram to transfer shapes of diagram into nodes
+   * of graph.
+   * 
+   * @param shapes
+   * @param shapeToNode
+   * @return a note list
+   */
+  @SuppressWarnings("unchecked")
+  private NodeList transferShapeToNode(List<Shape> shapes, Map<AnchorContainer, Node> shapeToNode) {
+    NodeList nodeList = new NodeList();
+    for (Shape shape : shapes) {
+      Node node = new Node();
+      GraphicsAlgorithm ga = shape.getGraphicsAlgorithm();
+      node.x = ga.getX();
+      node.y = ga.getY();
+      node.width = ga.getWidth();
+      node.height = ga.getHeight();
+      node.data = shape;
+      shapeToNode.put(shape, node);
+      nodeList.add(node);
+    }
+    return nodeList;
   }
 
   /**
@@ -105,45 +245,6 @@ public class LayoutDiagramFeature extends AbstractLayoutFeature {
       shape.getGraphicsAlgorithm().setWidth(node.width);
       shape.getGraphicsAlgorithm().setHeight(node.height);
     }
-  }
-
-  /**
-   * Help method to map diagram objects to a graph nodes.
-   * 
-   * @return The graph.
-   */
-  @SuppressWarnings("unchecked")
-  private CompoundDirectedGraph mapDiagramToGraph() {
-    Map<AnchorContainer, Node> shapeToNode = new HashMap<AnchorContainer, Node>();
-    Diagram d = getDiagram();
-    CompoundDirectedGraph dg = new CompoundDirectedGraph();
-    EdgeList edgeList = new EdgeList();
-    NodeList nodeList = new NodeList();
-    EList<Shape> children = d.getChildren();
-
-    for (Shape shape : children) {
-      Node node = new Node();
-      GraphicsAlgorithm ga = shape.getGraphicsAlgorithm();
-      node.x = ga.getX();
-      node.y = ga.getY();
-      node.width = ga.getWidth();
-      node.height = ga.getHeight();
-      node.data = shape;
-      shapeToNode.put(shape, node);
-      nodeList.add(node);
-    }
-
-    EList<Connection> connections = d.getConnections();
-    for (Connection connection : connections) {
-      AnchorContainer source = connection.getStart().getParent();
-      AnchorContainer target = connection.getEnd().getParent();
-      Edge edge = new Edge(shapeToNode.get(source), shapeToNode.get(target));
-      edge.data = connection;
-      edgeList.add(edge);
-    }
-    dg.nodes = nodeList;
-    dg.edges = edgeList;
-    return dg;
   }
 
 }

@@ -20,15 +20,13 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 
 /**
  * Feature handle creating a new Feature model object.
- * 
  */
 public class CreateFeatureFeature extends AbstractCreateFeature {
 
   /**
    * Creates an instance of {@link CreateFeatureFeature}.
    * 
-   * @param fp
-   *          The feature provider.
+   * @param fp The feature provider.
    */
   public CreateFeatureFeature(IFeatureProvider fp) {
     super(fp, "Feature", "Create a new feature");
@@ -37,8 +35,7 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
   /**
    * Checks if a Feature Model object can be created for the given context.
    * 
-   * @param context
-   *          The context.
+   * @param context The context.
    * @return true if create is possible
    */
   @Override
@@ -49,8 +46,7 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
     // check whether the new Feature is wanted to be added to a connection.
     if (targetConnection != null) {
       bo = this.getFeatureProvider().getBusinessObjectForPictogramElement(targetConnection);
-    }
-    else {
+    } else {
       bo = this.getFeatureProvider().getBusinessObjectForPictogramElement(targetContainer);
     }
 
@@ -58,11 +54,9 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
     // else the new Feature can only be added to an existing Feature or Group
     if (this.getDiagram().getChildren().isEmpty()) {
       return true;
-    }
-    else if (bo instanceof Feature) {
+    } else if (bo instanceof Feature) {
       return true;
-    }
-    else if (bo instanceof Group) {
+    } else if (bo instanceof Group) {
       return true;
     }
 
@@ -70,11 +64,9 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
   }
 
   /**
-   * Creates a new Feature model object and initiate the adding a graphical
-   * representation to the diagram.
+   * Creates a new Feature model object and initiate the adding a graphical representation to the diagram.
    * 
-   * @param context
-   *          The context.
+   * @param context The context.
    * @return The new Feature model object.
    */
   @Override
@@ -99,8 +91,7 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
     // check whether the new Feature is wanted to be added to a connection.
     if (targetConnection != null) {
       parent = this.getFeatureProvider().getBusinessObjectForPictogramElement(targetConnection);
-    }
-    else {
+    } else {
       parent = this.getFeatureProvider().getBusinessObjectForPictogramElement(targetContainer);
     }
 
@@ -123,18 +114,15 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
       updatePictogramElement(connection);
     }
 
-    return new Object[] { newFeature };
+    return new Object[] {newFeature};
   }
 
   /**
    * Creates the new Group or add new Feature to an existing Group.
    * 
-   * @param parent
-   *          The parent the new Feature is added to.
-   * @param newFeature
-   *          The new Feature.
-   * @param context
-   *          The context;
+   * @param parent The parent the new Feature is added to.
+   * @param newFeature The new Feature.
+   * @param context The context;
    */
   private void createGroup(Object parent, Feature newFeature, ICreateContext context) {
     // if the new Feature a child of an existing Feature create Group
@@ -152,16 +140,14 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
 
       // Add a graphical representation of Group model object.
       drawGroup(group, newFeature, parentFeature);
-    }
-    else if (parent instanceof Group) { // Add to the the existing Group.
+    } else if (parent instanceof Group) { // Add to the the existing Group.
       Group group = (Group) parent;
 
       // before adding update set relation notation
       RelationType relType = BOUtil.getRelationType(group);
-      if (RelationType.Mandatory.equals(relType)) {
+      if (RelationType.Mandatory.equals(relType) || RelationType.XOR.equals(relType)) {
         BOUtil.setRelationType(group, RelationType.XOR);
-      }
-      else {
+      } else {
         BOUtil.setRelationType(group, RelationType.OR);
       }
 
@@ -178,12 +164,9 @@ public class CreateFeatureFeature extends AbstractCreateFeature {
   /**
    * Initiates an adding a graphical representation of the Group.
    * 
-   * @param group
-   *          The Group to add.
-   * @param newFeature
-   *          The new child Feature.
-   * @param parentFeature
-   *          The parent Feature;
+   * @param group The Group to add.
+   * @param newFeature The new child Feature.
+   * @param parentFeature The parent Feature;
    */
   private void drawGroup(Group group, Feature newFeature, Feature parentFeature) {
     ContainerShape parentFeatureCS = BOUtil.getPictogramElementForBusinessObject(parentFeature, ContainerShape.class, getFeatureProvider());

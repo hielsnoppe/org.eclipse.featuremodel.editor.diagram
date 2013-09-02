@@ -5,10 +5,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.featuremodel.Feature;
 import org.eclipse.featuremodel.Group;
 import org.eclipse.featuremodel.diagrameditor.utilities.BOUtil;
+import org.eclipse.featuremodel.diagrameditor.utilities.Properties;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
-import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -70,14 +72,20 @@ public class ResizeFeatureFeature extends DefaultResizeShapeFeature {
 
     Feature movedFeature = (Feature) this.getFeatureProvider().getBusinessObjectForPictogramElement(context.getShape());
 
-    // update the inner text label to the new size
+    // update the inner text label and the expand sign to the property location
     EList<EObject> contents = shape.eContents();
     for (EObject eObject : contents) {
       if (eObject instanceof PictogramElement) {
         PictogramElement innerPictogram = (PictogramElement) eObject;
-        if (innerPictogram.getGraphicsAlgorithm() instanceof Text) {
-          Graphiti.getGaService().setLocationAndSize(innerPictogram.getGraphicsAlgorithm(), 10, 10, shape.getGraphicsAlgorithm().getWidth() - 20,
-              shape.getGraphicsAlgorithm().getHeight() - 20);
+        String value = Graphiti.getPeService().getPropertyValue(innerPictogram, Properties.PROP_KEY_CONTAINER_TYPE);
+        if (innerPictogram.getGraphicsAlgorithm() instanceof MultiText) {
+          MultiText text = (MultiText) innerPictogram.getGraphicsAlgorithm();
+          text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+          text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
+          Graphiti.getGaService().setLocationAndSize(text, 10, 10, width - 20, height - 20);
+        }
+        else if (value != null && Properties.PROP_VAL_CONTAINER_TYPE_EXPANDSIGN.equals(value)) {
+          Graphiti.getGaService().setLocation(innerPictogram.getGraphicsAlgorithm(), width - 20, height - 20);
         }
         this.updatePictogramElement(innerPictogram);
       }

@@ -1,6 +1,9 @@
 package org.eclipse.featuremodel.diagrameditor.features;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.featuremodel.Group;
 import org.eclipse.featuremodel.diagrameditor.utilities.BOUtil;
@@ -17,6 +20,7 @@ import org.eclipse.graphiti.mm.Property;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
@@ -90,7 +94,15 @@ public class UpdateRelationshipFeature extends AbstractUpdateFeature {
       else {
         updateSingleRelation(group);
       }
-
+      
+      return true;
+    }
+    else if (pe instanceof ContainerShape) {
+      ContainerShape cs = (ContainerShape) pe;
+      if (cs.getGraphicsAlgorithm() instanceof Text) {
+        Text text = (Text) cs.getGraphicsAlgorithm();
+        text.setValue(group.getLower() + "..." + group.getUpper());
+      }
       return true;
     }
 
@@ -195,6 +207,9 @@ public class UpdateRelationshipFeature extends AbstractUpdateFeature {
       relationBorder.setForeground(manageColor(ColorConstant.BLACK));
       relationBorder.setLineWidth(2);
       relationBorder.setLineVisible(true);
+      // if the relation changed to XOR, the cardinality should be disabled
+      removeCardinalityGraph(pe);
+      Graphiti.getPeService().setPropertyValue(getDiagram(), Properties.PROP_KEY_CARDINALITY_TYPE, Properties.PROP_VAL_CARDINALITY_TYPE_HIDDEN);
     }
     else {
       int[] points = new int[] { x0, y0, x1, y1, xCurveMiddle, yCurveMiddle, x2, y2 };
@@ -216,8 +231,9 @@ public class UpdateRelationshipFeature extends AbstractUpdateFeature {
   private void createSingleRelationGraphic(Group group, GraphicsAlgorithmContainer ga) {
     // create circle
     Ellipse relationGA = Graphiti.getGaService().createEllipse(ga);
-    relationGA.setHeight(15);
-    relationGA.setWidth(15);
+    relationGA.setHeight(14);
+    relationGA.setWidth(14);
+
     relationGA.setForeground(manageColor(IColorConstant.BLACK));
     if (RelationType.Mandatory.equals(BOUtil.getRelationType(group))) {
       relationGA.setBackground(manageColor(ColorConstant.BLACK));
@@ -226,6 +242,8 @@ public class UpdateRelationshipFeature extends AbstractUpdateFeature {
       relationGA.setBackground(manageColor(ColorConstant.WHITE));
     }
     relationGA.setLineWidth(2);
+    relationGA.setX(-7);
+    relationGA.setY(0);
   }
 
   /**
@@ -348,6 +366,57 @@ public class UpdateRelationshipFeature extends AbstractUpdateFeature {
    */
   @Override
   public IReason updateNeeded(final IUpdateContext context) {
-    return Reason.createFalseReason();
+    String pictogramName = null;
+    boolean updateRequired = false;
+    PictogramElement pictogramElement = context.getPictogramElement();
+    if (pictogramElement instanceof ContainerShape) {
+      ContainerShape cs = (ContainerShape) pictogramElement;
+      if (cs.getGraphicsAlgorithm() instanceof Text) {
+        Text text = (Text) cs.getGraphicsAlgorithm();
+        pictogramName = text.getValue();
+        int lower = 0;
+        int upper = 0;
+        Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+        if (bo instanceof Group) {
+          Group group = (Group) bo;
+          lower = group.getLower();
+          upper = group.getUpper();
+        }
+        updateRequired = (lower + "..." + upper).equals(pictogramName) ? false : true;
+      }
+    }
+
+    if (updateRequired) {
+      return Reason.createTrueReason("Name is out of Date");
+    }
+    else {
+      return Reason.createFalseReason();
+    }
+  }
+
+  /**
+   * Iterate all the shapes and delete the graph which represent cardinality.
+   * 
+   * @param pe
+   */
+  private void removeCardinalityGraph(ContainerShape pe) {
+
+    Collection<Shape> allContainedShapes = Graphiti.getPeService().getAllContainedShapes(pe.getContainer());
+
+    Set<Text> texts = new HashSet<Text>();
+    for (Shape shape : allContainedShapes) {
+      if (shape instanceof ContainerShape) {
+        ContainerShape cs = (ContainerShape) shape;
+        if (cs.getGraphicsAlgorithm() instanceof Text) {
+          Text text = (Text) cs.getGraphicsAlgorithm();
+          texts.add(text);
+        }
+      }
+    }
+
+    for (Text text : texts) {
+      Graphiti.getPeService().deletePictogramElement(text.getPictogramElement());
+    }
+
   }
 }

@@ -127,7 +127,7 @@ public class DirectEditDoubleClickFeature extends AbstractCustomFeature {
       directEditingInfo.setGraphicsAlgorithm(textGA);
 
       directEditingInfo.setActive(true);
-      getDiagramEditor().refresh();
+      getDiagramBehavior().refresh();
     }
   }
 }

@@ -31,4 +31,18 @@ public class Properties {
   public static final String PROP_KEY_CONTAINER_INIT_X          = "x";
   /** Property key for a container shape initial y coordinate. */
   public static final String PROP_KEY_CONTAINER_INIT_Y          = "y";
+  /** Property key for cardinality type in the diagram. */
+  public static final String PROP_KEY_CARDINALITY_TYPE          = "cardinalityType";
+  /** Property value for a cardinality type of present in the diagram. */
+  public static final String PROP_VAL_CARDINALITY_TYPE_PRESENT  = "present";
+  /** Property value for a cardinality type of hidden in the diagram. */
+  public static final String PROP_VAL_CARDINALITY_TYPE_HIDDEN   = "hidden";
+  /** Property key for the legend box type. */
+  public static final String PROP_KEY_LEGENDBOX_TYPE            = "legendBoxType";
+  /** Property value for a legend box type of complete. */
+  public static final String PROP_VAL_LEGENDBOX_TYPE_COMPLETE   = "complete";
+  /** Property value for a legend box type of adapted. */
+  public static final String PROP_VAL_LEGENDBOX_TYPE_ADAPTED   = "adapted";
+  /** Property value for a legend box type of hidden. */
+  public static final String PROP_VAL_LEGENDBOX_TYPE_HIDDEN   = "hidden";
 }
