@@ -25,10 +25,11 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-         name="Feature Model Editor"
-         id="org.eclipse.featuremodel.diagrameditor.wizard.category">
+         name="EMF Feature Model"
+         id="org.eclipse.featuremodel.wizard.category">
       </category>
       <wizard
+            category="org.eclipse.featuremodel.wizard.category"
             class="org.eclipse.featuremodel.diagrameditor.FMENewWizard"
             icon="icons/featuremodel.png"
             id="org.eclipse.featuremodel.diagrameditor.wizard"
