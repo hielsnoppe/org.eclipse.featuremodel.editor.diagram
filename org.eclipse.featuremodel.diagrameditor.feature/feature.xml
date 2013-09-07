@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.featuremodel.diagrameditor.feature"
       label="Feature Diagram Editor"
-      version="0.8.0"
+      version="0.8.1.qualifier"
       provider-name="Eclipse Modeling Project">
 
    <description url="http://www.eclipse.org/modeling/emft/featuremodel/">
