@@ -42,7 +42,9 @@ public class Properties {
   /** Property value for a legend box type of complete. */
   public static final String PROP_VAL_LEGENDBOX_TYPE_COMPLETE   = "complete";
   /** Property value for a legend box type of adapted. */
-  public static final String PROP_VAL_LEGENDBOX_TYPE_ADAPTED   = "adapted";
+  public static final String PROP_VAL_LEGENDBOX_TYPE_ADAPTED   	= "adapted";
   /** Property value for a legend box type of hidden. */
-  public static final String PROP_VAL_LEGENDBOX_TYPE_HIDDEN   = "hidden";
+  public static final String PROP_VAL_LEGENDBOX_TYPE_HIDDEN   	= "hidden";
+  /** Property value for the title of the color panel. */
+  public static final String PROP_VAL_COLOR_PANEL 				= "Color Panel";
 }

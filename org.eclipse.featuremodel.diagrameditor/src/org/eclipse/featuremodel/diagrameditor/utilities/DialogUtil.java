@@ -47,7 +47,7 @@ public class DialogUtil {
     if (color != null && color.eContainer() instanceof Diagram) {
       Shell shell = getShell();
       ColorDialog colorDialog = new ColorDialog(shell);
-      colorDialog.setText(Messages.ExampleUtil_ChooseColorTitel);
+      colorDialog.setText(Properties.PROP_VAL_COLOR_PANEL);
       colorDialog.setRGB(new RGB(color.getRed(), color.getGreen(), color.getBlue()));
 
       RGB retRgb = colorDialog.open();
